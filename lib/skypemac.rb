@@ -1,5 +1,5 @@
 require "skypemac/version"
 
-module Skypemac
-
-end
+require 'skypemac/base'
+require 'skypemac/skype'
+require 'skypemac/call'
