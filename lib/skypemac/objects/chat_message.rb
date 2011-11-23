@@ -1,5 +1,6 @@
 module SkypeMac
   class ChatMessage < SkypeMac::Base
+    @_class = 'CHATMESSAGE'
     class << self
     end
 

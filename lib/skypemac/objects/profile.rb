@@ -1,5 +1,6 @@
 module SkypeMac
   class Profile < SkypeMac::Base
+    @_class = 'PROFILE'
     class << self
     end
 

@@ -47,6 +47,7 @@ module SkypeMac
         api_name = api_name.to_s.upcase
         property_type = options[:type] || :string
         immutable = options[:immutable] || false
+        collection_class = options[:collection] || Class
 
         class_eval <<-RUBY
           def #{property_name.to_s}
@@ -56,12 +57,12 @@ module SkypeMac
                 $2
               end
             end
-            Base::property_convert(_property, :#{property_type}) unless _property.nil?
+            Base::property_convert(_property, :#{property_type}, #{collection_class}) unless _property.nil?
           end
         RUBY
       end
 
-      def property_convert(property, type)
+      def property_convert(property, type, collection_class)
         return if property.nil?
         case type
         when :string
@@ -72,6 +73,8 @@ module SkypeMac
           Time.at(property.to_i)
         when :boolean
           property =~ /true/i
+        when :collection
+          property.to_s.split(/, /).map {|x| collection_class.new(x) }
         else
           property
         end

@@ -1,5 +1,6 @@
 module SkypeMac
   class User < SkypeMac::Base
+    @_class = 'USER'
     class << self
     end
 

@@ -1,5 +1,8 @@
+require 'skypemac/objects/user'
+
 module SkypeMac
   class Group < SkypeMac::Base
+    @_class = 'GROUP'
     class << self
     end
 
@@ -13,10 +16,7 @@ module SkypeMac
     property :display_name
     property :user_count, :api_name=>:nrofusers
     property :online_user_count, :api_name=>:nrofusers_online
-
-    def users
-      #TODO
-    end
+    property :users, :type=>:collection, :collection=>SkypeMac::User
     #}}}
 
   end

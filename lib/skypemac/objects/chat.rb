@@ -1,3 +1,8 @@
+require 'skypemac/objects/user'
+require 'skypemac/objects/chat_message'
+require 'skypemac/objects/chat_member'
+
+
 module SkypeMac
   class Chat < SkypeMac::Base
     @_class = 'CHAT'
@@ -25,36 +30,12 @@ module SkypeMac
     property :bookmarked?,    :api_name=>:bookmarked, :type=>:boolean
     property :friendly_name,  :api_name=>:friendlyname
     property :timestamp,      :type=>:timestamp
-
-    def adder
-      adder = get_chat_property :adder
-      User.new adder
-    end
-
-    def posters
-      posters_str = get_chat_property :posters
-      posters = posters_str.split(/ /).map {|x| User.new(x)}
-    end
-
-    def members
-      members_str = get_chat_property :members
-      members = members_str.split(/ /).map {|x| User.new(x)}
-    end
-
-    def active_members
-      members_str = get_chat_property :activemembers
-      members = members_str.split(/ /).map {|x| User.new(x)}
-    end
-
-    def chat_messages
-      chat_messages_str = get_chat_property :chatmessages
-      chat_messages = chat_messages_str.split(/, /).map {|x| Chatmessage.new(x)}
-    end
-
-    def recent_chat_messages
-      chat_messages_str = get_chat_property :recentchatmessages
-      chat_messages = chat_messages_str.split(/, /).map {|x| Chatmessage.new(x)}
-    end
+    property :adder, :type=>:collection, :collection=>SkypeMac::User
+    property :posters, :type=>:collection, :collection=>SkypeMac::User
+    property :members, :type=>:collection, :collection=>SkypeMac::User
+    property :active_members, :api_name=>:activemembers, :type=>:collection, :collection=>SkypeMac::User
+    property :chat_messages,  :api_name=>:chatmessages,  :type=>:collection, :collection=>SkypeMac::ChatMessage
+    property :recent_chat_messages,  :api_name=>:recentchatmessages,  :type=>:collection, :collection=>SkypeMac::ChatMessage
 
     # protocol 7 additions
     property :password_hint, :api_name=>:passwordhint
