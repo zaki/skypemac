@@ -1,15 +1,27 @@
 require 'appscript'
 
 module SkypeMac
-  class Base
+  class SkypeException < ArgumentError
+    def initialize(command, error)
+      @command = command
+      @error = error
+    end
 
+    def to_s
+      "COMMAND '#{@command}' failed:\n#{@error}"
+    end
+  end
+
+  class Base
+    @_class = 'BASE'
+    @id = nil
     class << self
       # Sends an API command to Skype using the Applescript client
       def send(options)
         options[:script_name] ||= 'skypemac-ruby'
         result = Appscript.app('Skype').send_ options
         if result =~ /^ERROR /
-          raise SkypeException.new(result)
+          raise SkypeException.new(options[:command], result)
         end
         result
       end
@@ -27,6 +39,41 @@ module SkypeMac
           yield result
         else
           result
+        end
+      end
+
+      def property(property_name, options={})
+        api_name = options[:api_name] || property_name.to_s.gsub(/[?!]$/, '')
+        api_name = api_name.to_s.upcase
+        property_type = options[:type] || :string
+        immutable = options[:immutable] || false
+
+        class_eval <<-RUBY
+          def #{property_name.to_s}
+            #{immutable ? "@#{property_name.to_s}||" : '_property'}= Base::send_command "GET #{@_class} \#{@id} #{api_name}" do |result|
+              case result
+              when /^#{@_class} (.+) #{api_name} (.*)$/
+                $2
+              end
+            end
+            Base::property_convert(_property, :#{property_type}) unless _property.nil?
+          end
+        RUBY
+      end
+
+      def property_convert(property, type)
+        return if property.nil?
+        case type
+        when :string
+          property.to_s
+        when :integer
+          property.to_i
+        when :timestamp
+          Time.at(property.to_i)
+        when :boolean
+          property =~ /true/i
+        else
+          property
         end
       end
     end

@@ -1,5 +1,6 @@
 module SkypeMac
   class Call < SkypeMac::Base
+    @_class = 'CALL'
     class << self
       # -> CALL target[, target]*
       # <- CALL id status
@@ -18,24 +19,28 @@ module SkypeMac
     end
 
     #{{{ - Properties
-
-    #{{{ - Simple properties
-    %w(partner_handle partner_dispname target_identity conf_id status
-       video_status video_send_status video_receive_status
-       pstn_number duration pstn_status conf_participants_count
-       wm_duration wm_alloved_duration rate rate_currency rate_precision
-       input output capture_mic vaa_input_status
-       transfer_active transfer_status).each do |command|
-      class_eval <<-RUBY
-        def #{command}; get_call_property :#{command}; end
-      RUBY
-    end
-    #}}}
-
-    def timestamp
-      timestamp = get_call_property :timestamp
-      Time.at timestamp
-    end
+    property :partner_handle
+    property :partner_dispname
+    property :target_identity
+    property :conf_id
+    property :status
+    property :video_status
+    property :video_send_status
+    property :video_receive_status
+    property :pstn_number
+    property :duration, :type=>:integer
+    property :pstn_status
+    property :conf_participants_count, :type=>:integer
+    property :wm_duration, :type=>:integer
+    property :wm_allowed_duration, :type=>:integer
+    property :rate, :type=>:integer
+    property :rate_currency
+    property :rate_precision
+    property :transfer_active?, :api_name=>:transfer_active, :type=>:boolean
+    property :transfer_status
+    property :timestamp, :type=>:timestamp
+    property :failure_reason, :api_name=>:failurereason
+    property :type, :immutable=>true
 
     def conf_participant(index)
       Base::send_command "GET CALL #{@id} CONF_PARTICIPANT #{index}" do |response|
@@ -44,14 +49,6 @@ module SkypeMac
           return $1
         end
       end
-    end
-
-    def failure_reason
-      get_call_property :failurereason
-    end
-
-    def type
-      @type ||= get_call_property :type
     end
 
     #{{{ - Type helpers
@@ -84,18 +81,6 @@ module SkypeMac
     #}}}
 
     #}}}
-
-    # -> GET CALL id property
-    # <- CALL id property value
-    def get_call_property(property)
-      prop = property.to_s.upcase
-      Base::send_command "GET CALL #{@id} #{prop}" do |response|
-        case response
-        when /^CALL #{@id} #{prop} (.*)$/
-          return $1
-        end
-      end
-    end
 
     # -> SET CALL id STATUS status
     # <- CALL id STATUS status
