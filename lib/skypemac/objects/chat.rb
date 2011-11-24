@@ -7,14 +7,26 @@ module SkypeMac
   class Chat < SkypeMac::Base
     @_class = 'CHAT'
     class << self
-      def recent_chats
-        Base::send_command "SEARCH RECENTCHATS" do |result|
+      def _search(command)
+        Base::send_command "SEARCH #{command}" do |result|
           case result
           when /^CHATS (.*)$/
             chats = $1
             return chats.split(', ').map {|x| Chat.new x}
           end
         end
+      end
+      def recent_chats
+        _search "RECENTCHATS"
+      end
+      def active_chats
+        _search "ACTIVECHATS"
+      end
+      def missed_chats
+        _search "MISSEDCHATS"
+      end
+      def bookmarked_chats
+        _search "BOOKMARKEDCHATS"
       end
     end
 

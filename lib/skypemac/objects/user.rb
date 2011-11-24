@@ -2,10 +2,32 @@ module SkypeMac
   class User < SkypeMac::Base
     @_class = 'USER'
     class << self
+      def _search(command)
+        Base::send_command "SEARCH #{command}" do |result|
+          case result
+          when /^USERS (.*)$/
+            users = $1
+            return users.split(', ').map {|x| User.new x}
+          end
+        end
+      end
+      def search(keyword)
+        _search "USERS #{keyword}"
+      end
+      def friends
+        _search "FRIENDS"
+      end
+      def users_waiting_authorization
+        _search "USERSWAITINGMYAUTHORIZATION"
+      end
     end
 
     def initialize(id)
       @id = id
+    end
+
+    def to_s
+      @id
     end
 
     #{{{ - Properties

@@ -4,6 +4,20 @@ module SkypeMac
   class Group < SkypeMac::Base
     @_class = 'GROUP'
     class << self
+      def _search(command)
+        Base::send_command "SEARCH #{command}" do |result|
+          case result
+          when /^GROUPS (.*)$/
+            users = $1
+            return users.split(', ').map {|x| User.new x}
+          end
+        end
+      end
+
+      # [{ALL|CUSTOM|HARDWIRED}]
+      def search(type='')
+        _search "GROUPS #{type.to_s.upcase}"
+      end
     end
 
     def initialize(id)

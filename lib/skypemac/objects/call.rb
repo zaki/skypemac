@@ -12,6 +12,26 @@ module SkypeMac
           end
         end
       end
+      def _search(command)
+        Base::send_command "SEARCH #{command}" do |result|
+          case result
+          when /^CALLS (.*)$/
+            calls = $1
+            return calls.split(', ').map {|x| Call.new x}
+          end
+        end
+      end
+
+      def search(target)
+        _search "CALLS #{target}"
+      end
+      def active_calls
+        _search "ACTIVECALLS"
+      end
+      def missed_calls
+        _search "MISSEDCALLS"
+      end
+
     end
 
     def initialize(id)
