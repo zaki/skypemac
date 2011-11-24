@@ -59,6 +59,24 @@ module SkypeMac
     property :blob
     property :activity_timestamp, :type=>:timestamp
 
+    # ALTER commands
+    alter :topic
+    alter :topic_xml, :api_name=>:settopicxml
+    alter :leave!
+    alter :bookmark!
+    alter :unbookmark!
+    alter :join!
+    alter :clear_recent_messages!, :api_name=>:clearrecentmessages
+    alter :alert_string, :api_name=>:alertstring
+    alter :accept_add!, :api_name=>:acceptadd
+    alter :disband!
+
+    alter :password
+    alter :enter_password, :api_name=>:enterpassword
+    alter :options
+    alter :kick
+    alter :kickban
+
     def member_objects
       #TODO
     end

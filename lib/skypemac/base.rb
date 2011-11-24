@@ -62,6 +62,39 @@ module SkypeMac
         RUBY
       end
 
+      def property_writer(property_name, options={})
+        api_name = options[:api_name] || property_name.to_s.gsub(/[?!]$/, '')
+        api_name = api_name.to_s.upcase
+
+        class_eval <<-RUBY
+          def #{property_name.to_s}=(value)
+            Base::send_command "SET #{@_class} \#{@id} #{api_name} \#{value}" do |result|
+              case result
+              when /^#{@_class} (.+) #{api_name} (.*)$/
+                $2
+              end
+            end
+          end
+        RUBY
+      end
+
+      def alter(property_name, options={})
+        api_name = options[:api_name] || (property_name.to_s =~ /!$/ ? '' : 'SET')+property_name.to_s.gsub(/[?!]$/, '')
+        api_name = api_name.to_s.upcase
+        signature = property_name.to_s =~ /!$/ ? "#{property_name}(*value)" : "#{property_name.to_s}=(*value)"
+
+        class_eval <<-RUBY
+          def #{signature}
+            Base::send_command "ALTER #{@_class} \#{@id} #{api_name} \#{Array(value).join(', ')}" do |result|
+              case result
+              when /^#{@_class} (.+) (#{api_name} )?(.*)$/
+                $3
+              end
+            end
+          end
+        RUBY
+      end
+
       def property_convert(property, type, collection_class)
         return if property.nil?
         case type

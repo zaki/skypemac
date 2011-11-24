@@ -2,6 +2,27 @@ module SkypeMac
   class User < SkypeMac::Base
     @_class = 'USER'
     class << self
+      def current_user
+        Base::send_command "GET CURRENTUSERHANDLE" do |result|
+          if result =~ /^CURRENTUSERHANDLE (.*)$/
+            User.new $1
+          end
+        end
+      end
+      def status
+        Base::send_command "GET USERSTATUS" do |result|
+          if result =~ /^USERSTATUS (.*)$/
+            $1
+          end
+        end
+      end
+      def status=(value)
+        Base::send_command "SET USERSTATUS #{value}" do |result|
+          if result =~ /^USERSTATUS (.*)$/
+            $1
+          end
+        end
+      end
       def _search(command)
         Base::send_command "SEARCH #{command}" do |result|
           case result
@@ -61,6 +82,12 @@ module SkypeMac
     property :received_auth_request, :api_name=>:receivedauthrequest
     property :call_forwarding_active?, :api_name=>:is_cf_active, :type=>:boolean
     property :authorized_buddy_count, :api_name=>:nrof_authed_buddies, :type=>:integer
+
+    property_writer :buddy_status, :api_name=>:buddystatus
+    property_writer :is_blocked, :api_name=>:isblocked
+    property_writer :is_authorized, :api_name=>:isauthorized
+    property_writer :speeddial
+    property_writer :display_name, :api_name=>:displayname
     #}}}
 
   end

@@ -39,12 +39,8 @@ module SkypeMac
     property :editable?, :type=>:boolean
     property :edited_timestamp, :type=>:timestamp
 
-    def seen=
-      #TODO
-    end
-    def body=
-      #TODO
-    end
+    property_writer :seen
+    property_writer :body
     #}}}
   end
 end

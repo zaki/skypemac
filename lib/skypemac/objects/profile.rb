@@ -32,6 +32,9 @@ module SkypeMac
     property :call_forward_rules
     property :call_send_to_voicemail, :api_name=>:call_send_to_vm
     property :sms_validated_numbers
+
+    property_writer :mood_text
+    property_writer :rich_mood_text
     #}}}
 
   end
