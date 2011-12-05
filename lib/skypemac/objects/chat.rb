@@ -34,6 +34,10 @@ module SkypeMac
       @id = id
     end
 
+    def send_message(message)
+      Base::send_command "CHATMESSAGE #{@id} #{message}"
+    end
+
     #{{{ - Properties
     property :name
     property :topic
