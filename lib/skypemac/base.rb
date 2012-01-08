@@ -105,7 +105,7 @@ module SkypeMac
         when :timestamp
           Time.at(property.to_i)
         when :boolean
-          property =~ /true/i
+          !!(property =~ /true/i)
         when :collection
           property.to_s.split(/, /).map {|x| collection_class.new(x) }
         else
