@@ -4,11 +4,14 @@ module SkypeMac
     class << self
       # -> CALL target[, target]*
       # <- CALL id status
-      def call(*target)
+      def call(*targets)
         protocol_required 1
-        command :call, list(:target) do
-          match /^CALL (\d+) (.*)$/ do
+        Base::send_command "CALL #{Array(targets).join(',')}" do |result|
+          case result
+          when /^CALL (\d+) (.*)$/
             return Call.new($1)
+          else
+            raise SkypeException.new("CALL", result)
           end
         end
       end
