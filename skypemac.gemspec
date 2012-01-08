@@ -4,7 +4,7 @@ require "skypemac/version"
 
 Gem::Specification.new do |s|
   s.name        = "skypemac"
-  s.version     = Skypemac::VERSION
+  s.version     = SkypeMac::VERSION
   s.authors     = ["Zoltan Dezso"]
   s.email       = ["dezso.zoltan@gmail.com"]
   s.homepage    = ""
