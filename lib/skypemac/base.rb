@@ -48,16 +48,17 @@ module SkypeMac
         property_type = options[:type] || :string
         immutable = options[:immutable] || false
         collection_class = options[:collection] || Class
+        property_var = immutable ? "@#{property_name.to_s}" : "_property"
 
         class_eval <<-RUBY
           def #{property_name.to_s}
-            #{immutable ? "@#{property_name.to_s}||" : '_property'}= Base::send_command "GET #{@_class} \#{@id} #{api_name}" do |result|
+            #{property_var} #{immutable ? "||=" : "="} Base::send_command "GET #{@_class} \#{@id} #{api_name}" do |result|
               case result
               when /^#{@_class} (.+) #{api_name} (.*)$/
                 $2
               end
             end
-            Base::property_convert(_property, :#{property_type}, #{collection_class}) unless _property.nil?
+            Base::property_convert(#{property_var}, :#{property_type}, #{collection_class}) unless #{property_var}.nil?
           end
         RUBY
       end
